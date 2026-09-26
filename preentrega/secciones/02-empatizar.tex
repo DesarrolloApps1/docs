@@ -1,0 +1,78 @@
+\section{Empatizar: el problema y quién lo tiene}
+\label{sec:empatizar}
+
+\subsection{Descripción del problema}
+
+\begin{description}[style=nextline,leftmargin=0pt,font=\color{verde}]
+\item[¿Qué problema existe?]
+Mucha gente quiere usar menos el celular y no lo logra sostener. Las herramientas que existen muestran estadísticas o bloquean apps, pero no le dan nada a la persona cuando lo consigue.
+\item[¿Quién lo tiene?]
+Adultos de 18 a 35 años que usan el teléfono todo el día y que ya probaron alguna app de tiempo de pantalla.
+\item[¿En qué contexto ocurre?]
+En la vida diaria: en casa, en el trabajo, en el colectivo. El celular siempre está a mano y las notificaciones compiten por la atención.
+\item[¿Cómo se resuelve hoy?]
+Con Bienestar digital de Android o Tiempo en pantalla de iOS, y con apps como Forest o one sec, que obligan a iniciar una sesión o agregan una espera antes de abrir otras apps.
+\item[¿Qué dificultades tiene esa solución?]
+Piden un esfuerzo activo (acordarse de iniciar la sesión, configurar límites), funcionan como castigo y el logro no tiene ningún efecto fuera del teléfono. Al tiempo se ignoran o se desinstalan.
+\item[¿Por qué una app móvil mejoraría la situación?]
+El dato que importa, cuánto tiempo estuvo el teléfono sin usarse, lo registra el propio sistema operativo. Solo una app instalada en el teléfono puede leerlo sin pedirle nada al usuario.
+\end{description}
+
+\subsection{Usuario principal}
+
+\begin{table}[H]
+\centering\small
+\begin{tabularx}{\textwidth}{@{}l L@{}}
+\toprule
+\textbf{Atributo} & \textbf{Descripción} \\
+\midrule
+Características & Entre 18 y 35 años, usa el celular muchas horas por día, quiere bajar ese uso pero no lo sostiene. \\
+Necesidad principal & Un motivo concreto para dejar el teléfono, no más información sobre cuánto lo usa. \\
+Contexto de uso & Casi todo el uso es pasivo: la app trabaja en segundo plano. Se abre un rato para ver puntos o canjear. \\
+Frecuencia & Entre 2 y 4 aperturas breves por día. Un canje por semana, aproximadamente. \\
+Restricciones & Poco tiempo, una sola mano, a veces caminando o parado frente al mostrador de un local. \\
+Conectividad & Intermitente. Durante la pausa el teléfono puede estar en modo avión o sin señal. \\
+Condiciones situacionales & Luz variable al mostrar el código en un local; apuro porque hay gente esperando. \\
+Dificultades actuales & Se olvida de activar las herramientas y pierde la motivación porque no recibe nada a cambio. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{nota}[title={Persona: Martina, 27 años},coltitle=white,colbacktitle=verde,fonttitle=\bfseries]
+Trabaja como diseñadora en Palermo y vive a diez cuadras de la oficina. Revisa el celular apenas se despierta y otra vez antes de dormir. Probó Forest dos semanas y lo dejó: se olvidaba de plantar el árbol. Le gustaría leer más y salir a caminar, y le encantan los cafés de especialidad del barrio.
+
+\textit{“Sé que lo uso demasiado. Lo que no tengo es una razón para dejarlo.”}
+\end{nota}
+
+La persona es un arquetipo armado con supuestos del equipo. La idea es validarla con las entrevistas del plan de la sección~\ref{sec:testear}.
+
+El comercio adherido es un usuario secundario. Publica premios y los entrega en el local, pero en esta versión no tiene una app propia: sus datos se cargan como datos semilla.
+
+\subsection{Contexto de uso}
+
+Seguimos la idea de computación ubicua de Mark Weiser: la mejor interacción con esta app es no tener que abrirla. El usuario nunca declara que empieza una pausa. Deja el teléfono y la app se ocupa del resto. Solo vuelve a aparecer para avisar que sumó puntos.
+
+Hay dos momentos en los que sí hay interacción, y los dos son cortos:
+\begin{itemize}
+\item \textbf{Mirar cómo va}: abre la app desde la notificación, ve el saldo y cuánto le falta para su meta. Menos de 10 segundos.
+\item \textbf{Canjear}: está en el local, con una mano, quizás con gente atrás. Necesita encontrar el premio, confirmar y mostrar un código que se lea bien.
+\end{itemize}
+
+\subsection{Recorrido actual del usuario}
+
+Así se ve hoy el intento de usar menos el celular con las herramientas que existen. La última columna es lo que tomamos para el diseño.
+
+\begin{table}[H]
+\centering\small
+\begin{tabularx}{\textwidth}{@{}l L l L@{}}
+\toprule
+\textbf{Etapa} & \textbf{Qué hace} & \textbf{Cómo se siente} & \textbf{Oportunidad} \\
+\midrule
+Decide    & “Esta semana lo uso menos.” & Motivada & Aprovechar el impulso sin pedir configuración \\
+Configura & Instala una app, arma límites y horarios & Cansada & Cero configuración \\
+Usa       & Tiene que acordarse de activar el modo foco & Se olvida & Detectar las pausas sola \\
+Ve el resultado & Un gráfico o un árbol virtual & Indiferente & Un premio real y cerca \\
+Abandona  & Desinstala o ignora los avisos & Culpa & Reglas amables, racha y meta \\
+\bottomrule
+\end{tabularx}
+\end{table}

@@ -1,0 +1,50 @@
+\section{Persistencia y datos}
+\label{sec:datos}
+
+Hay dos tipos de datos. Las pausas y los canjes se generan en el teléfono. Los comercios y los premios vienen del backend y se guardan en Room como caché.
+
+\begin{table}[H]
+\centering\small
+\begin{tabularx}{\textwidth}{@{}l L l l@{}}
+\toprule
+\textbf{Entidad} & \textbf{Campos principales} & \textbf{Origen} & \textbf{Dónde vive} \\
+\midrule
+\texttt{BreakSession} & id, inicio, fin, minutos válidos, puntos, estado (válida, corta, descanso, tope) & Teléfono & Room \\
+\texttt{Business} & id, nombre, dirección, barrio, lat, lng, horario & API & Room (caché) \\
+\texttt{Reward} & id, businessId, título, puntos, stock diario, actualizado & API & Room (caché) \\
+\texttt{Redemption} & id (UUID), rewardId, puntos, código, estado (pendiente, activo, usado, vencido, devuelto), creado, vence & Teléfono y API & Room y servidor \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\textbf{Relaciones.} Un comercio tiene muchos premios y un premio puede tener muchos canjes. Las pausas no se relacionan con nada.
+
+\textbf{El saldo no se guarda.} Se calcula como la suma de los puntos de las pausas menos los puntos de los canjes que no fueron devueltos. Así no puede quedar desincronizado con el historial.
+
+\textbf{DataStore} guarda lo que no es una tabla: el checkpoint de eventos, la meta elegida, la meta diaria, si las notificaciones están activas, la hora de la última sincronización y el token de sesión cifrado.
+
+Las pausas no se suben al servidor. Además de ahorrar red, es una decisión de privacidad: el horario en que alguien deja el teléfono dice mucho de su rutina.
+
+\section{Estrategia Offline First}
+\label{sec:offline}
+
+La detección de pausas no usa la red en ningún momento. Lo único que depende de la conexión es el catálogo, el mapa y la confirmación de canjes.
+
+\begin{table}[H]
+\centering\small
+\begin{tabularx}{\textwidth}{@{}l L L@{}}
+\toprule
+\textbf{Situación} & \textbf{Qué hace la app} & \textbf{Qué ve el usuario} \\
+\midrule
+Tiene conexión & Actualiza el catálogo cada 6 h, y al abrir Explorar si pasó más de 1 h. Envía los canjes pendientes. & Todo normal. \\
+Pierde conexión & Sigue detectando y sumando. Los canjes nuevos quedan pendientes con los puntos reservados. & Un aviso: “Sin conexión · tus pausas se siguen contando” (frames 12 y 15). \\
+Recupera conexión & Un worker con la restricción de red envía los pendientes, con reintentos y espera exponencial. & Una notificación cuando el canje se confirma. \\
+Datos viejos & Muestra el catálogo guardado. El stock se vuelve a validar en el servidor al canjear. & La hora de la última actualización. \\
+Sin datos todavía & Solo puede pasar en Explorar la primera vez sin red. Inicio funciona igual. & Estado de error con Reintentar (frame 16). \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\textbf{Conflictos.} Para el catálogo y el stock manda el servidor. Si un canje pendiente se rechaza porque el premio se agotó o se dio de baja, pasa a “devuelto”, los puntos vuelven al saldo y se avisa al usuario (frame 22). El UUID que genera el teléfono evita duplicados si un envío se reintenta.
+
+\textbf{Mapa sin red.} Los marcadores salen de Room, pero el fondo del mapa necesita conexión. En ese caso se muestra solo la lista.

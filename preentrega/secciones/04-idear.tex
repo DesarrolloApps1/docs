@@ -1,0 +1,90 @@
+\section{Idear: la propuesta}
+\label{sec:idear}
+
+\subsection{Propuesta de solución}
+
+\begin{table}[H]
+\centering\small
+\begin{tabularx}{\textwidth}{@{}l L@{}}
+\toprule
+Nombre provisorio & Take a Break \\
+Descripción & App Android que detecta sola los períodos en que el teléfono estuvo bloqueado, los valida con reglas simples y acredita puntos canjeables en comercios cercanos. \\
+Usuario principal & Adultos jóvenes que quieren usar menos el celular (sección~\ref{sec:empatizar}). \\
+Propuesta de valor & Desconectarse deja de ser un castigo y pasa a tener premio. \\
+Escenario principal & Martina deja el teléfono en la mesa durante la cena. Cuando lo agarra le llega “Break validado: +60 pts. Ya te alcanza para un café”. Al día siguiente pasa por el café, canjea y muestra el código en el mostrador. \\
+Beneficio esperado & Más tiempo sin pantalla para el usuario y clientes nuevos para el comercio. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{¿Por qué una app móvil y no una web?}
+
+\begin{itemize}
+\item \textbf{El dato está en el teléfono.} Los eventos de pantalla y bloqueo los registra Android (\texttt{UsageStatsManager}). Un sitio web no puede leerlos.
+\item \textbf{Trabaja sin que la abran.} WorkManager consulta esos eventos en segundo plano, cada 15 minutos, sin un proceso corriendo todo el tiempo.
+\item \textbf{Avisa en el momento justo.} Una notificación local cierra el ciclo de recompensa apenas termina la pausa, aunque no haya red.
+\item \textbf{Acompaña al usuario al local.} El mapa usa la ubicación del teléfono y el código se muestra en el mostrador.
+\end{itemize}
+
+\subsection{Caso de negocio y propuesta de valor}
+
+El proyecto genera valor para dos partes:
+
+\begin{itemize}
+\item \textbf{Usuario} (valor social y de experiencia): un incentivo positivo para desconectarse, gratis.
+\item \textbf{Comercio local} (valor económico): una forma barata de atraer gente nueva, pensada sobre todo para locales chicos o recién abiertos.
+\end{itemize}
+
+La idea se inspira en Pasito, que premia los pasos con canjes en comercios. En nuestro caso el comercio paga una suscripción mensual para publicar sus premios y esa suscripción financia la plataforma. El usuario nunca paga. Cada canje lleva a una persona al local, que muchas veces compra algo más.
+
+En esta versión no hay pagos ni suscripciones reales. Los comercios y sus premios se cargan como datos semilla en el backend del equipo.
+
+\subsection{Ideas evaluadas y descartadas}
+
+Antes de llegar a la propuesta comparamos varias alternativas contra los principios de la sección~\ref{sec:definir}.
+
+\begin{table}[H]
+\centering\small
+\begin{tabularx}{\textwidth}{@{}l L@{}}
+\toprule
+\textbf{Idea} & \textbf{Por qué no} \\
+\midrule
+Bloquear apps o agregar una espera & Es el enfoque de castigo que el usuario ya abandonó. \\
+Botón “empezar pausa” & Depende de la memoria del usuario. Va contra P1. \\
+Servicio escuchando \texttt{SCREEN\_OFF} & Necesita un proceso vivo todo el día, gasta batería y muestra una notificación fija. Lo reemplaza la consulta periódica a \texttt{UsageStatsManager}. \\
+Acelerómetro para confirmar que el celular está quieto & No aporta información que los eventos de bloqueo no den, y consume batería. \\
+Ubicación en segundo plano y geofencing & Es un permiso sensible y el caso central no lo necesita. \\
+Premios virtuales (insignias, árboles) & No resuelven la falta de un incentivo tangible. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Alcance}
+
+Priorizamos cerrar un solo ciclo completo: \textbf{detectar $\rightarrow$ validar $\rightarrow$ premiar $\rightarrow$ ubicar $\rightarrow$ canjear}.
+
+\begin{minipage}[t]{0.49\textwidth}
+\textbf{Dentro del alcance}
+\begin{itemize}
+\item Detección pasiva de pausas y validación con reglas anti-abuso.
+\item Saldo, meta, racha e historial, todo offline.
+\item Catálogo de 5 o 6 comercios de ejemplo, con mapa y lista.
+\item Canje con código, incluido el canje pendiente sin conexión.
+\item Notificación local al validar una pausa o confirmar un canje.
+\item Acceso con Google o email.
+\end{itemize}
+\end{minipage}\hfill
+\begin{minipage}[t]{0.49\textwidth}
+\textbf{Fuera del alcance}
+\begin{itemize}
+\item App o panel para que los comercios carguen premios.
+\item Pagos y suscripciones reales.
+\item Navegación hasta el local y geofencing.
+\item Ubicación en segundo plano.
+\item Desafíos grupales y ranking.
+\item Antifraude del lado del servidor (ver limitaciones).
+\end{itemize}
+\end{minipage}
+
+\medskip
+\textbf{Limitación conocida.} Los puntos se calculan en el teléfono y el servidor confía en ese cálculo al canjear. Alcanza para un prototipo con comercios de prueba. Un producto real tendría que validar las pausas del lado del servidor.

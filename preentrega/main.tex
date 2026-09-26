@@ -1,0 +1,86 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[spanish,es-tabla,es-nodecimaldot,es-noquoting]{babel}
+\usepackage{lmodern}
+\usepackage{microtype}
+\usepackage[margin=2.4cm]{geometry}
+\usepackage{graphicx}
+\usepackage{xcolor}
+\usepackage{tabularx,booktabs,array}
+\usepackage{enumitem}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{pdflscape}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{listings}
+\usepackage[most]{tcolorbox}
+\usepackage{tikz}
+\usetikzlibrary{positioning,arrows.meta,fit,backgrounds,calc,babel}
+\usepackage[hidelinks]{hyperref}
+
+% Colores
+% Mismos tokens que el sistema de diseño (figma/build.py)
+\definecolor{bosque}{HTML}{0B3B2C}
+\definecolor{verde}{HTML}{136B4A}
+\definecolor{lima}{HTML}{E4F56A}
+\definecolor{crema}{HTML}{F7F3EC}
+\definecolor{tinta}{HTML}{16211C}
+\definecolor{gris}{HTML}{5F6B64}
+\definecolor{linea}{HTML}{E7E1D6}
+\definecolor{ambar}{HTML}{FFF3D6}
+
+\graphicspath{{../figma/png/}{img/}}
+
+\titleformat{\section}{\Large\bfseries\color{bosque}}{\thesection.}{0.6em}{}
+\titleformat{\subsection}{\large\bfseries\color{tinta}}{\thesubsection.}{0.6em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{verde}}{}{0em}{}
+
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small\color{gris}Take a Break · Preentrega}
+\fancyhead[R]{\small\color{gris}Desarrollo de Aplicaciones I · UADE}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\setlist{itemsep=2pt,topsep=4pt}
+\setlength{\parskip}{0.5em}
+\setlength{\parindent}{0pt}
+\renewcommand{\arraystretch}{1.25}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+
+\lstset{basicstyle=\ttfamily\small,frame=single,rulecolor=\color{linea},
+  backgroundcolor=\color{crema},xleftmargin=4pt,xrightmargin=4pt,columns=fullflexible,
+  literate={á}{{\'a}}1 {é}{{\'e}}1 {í}{{\'i}}1 {ó}{{\'o}}1 {ú}{{\'u}}1 {ñ}{{\~n}}1}
+
+% Requisito funcional
+\newtcolorbox{rf}[1]{enhanced,colback=white,colframe=bosque,coltitle=white,
+  fonttitle=\bfseries,title={#1},arc=2mm,boxrule=0.6pt,left=6pt,right=6pt}
+% Recuadro destacado
+\newtcolorbox{nota}[1][]{enhanced,colback=crema,colframe=verde,arc=2mm,
+  boxrule=0.6pt,left=6pt,right=6pt,#1}
+
+% Dato que el equipo todavía tiene que completar
+\newcommand{\pendiente}[1]{\textcolor{red!70!black}{[#1]}}
+\newcommand{\pantalla}[2]{\begin{minipage}[t]{0.235\textwidth}\centering
+  \includegraphics[width=\linewidth]{#1}\\[2pt]{\footnotesize #2}\end{minipage}}
+
+\begin{document}
+
+\input{secciones/00-portada}
+\input{secciones/01-introduccion}
+\input{secciones/02-empatizar}
+\input{secciones/03-definir}
+\input{secciones/04-idear}
+\input{secciones/05-requisitos}
+\input{secciones/06-prototipar}
+\input{secciones/07-arquitectura}
+\input{secciones/08-datos-offline}
+\input{secciones/09-tecnologias}
+\input{secciones/10-equipo}
+\appendix
+\input{secciones/11-anexos}
+
+\end{document}

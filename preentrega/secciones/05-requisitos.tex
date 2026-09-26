@@ -1,0 +1,70 @@
+\section{Requisitos}
+\label{sec:requisitos}
+
+\subsection{Requisitos funcionales}
+
+En todos los casos el usuario involucrado es el usuario final de la app.
+
+\begin{rf}{RF01. Detectar y validar pausas}
+\textbf{Descripción:} la app detecta sola los períodos en que el teléfono estuvo bloqueado, los guarda y les aplica las reglas de validación de la tabla~\ref{tab:reglas}.\\
+\textbf{Criterio de aceptación:} si el teléfono queda bloqueado 60 minutos un día hábil entre las 9 y las 23 h, la pausa aparece como válida con +60 puntos y llega una notificación, a más tardar 30 minutos después de desbloquearlo o apenas se abre la app. Funciona igual en modo avión.
+\end{rf}
+
+\begin{rf}{RF02. Consultar saldo, meta e historial}
+\textbf{Descripción:} el usuario ve su saldo, el avance hacia la meta elegida, la racha y el historial de pausas.\\
+\textbf{Criterio de aceptación:} sin conexión, Inicio y Actividad muestran saldo, meta, racha y las pausas de los últimos 30 días. Cada pausa que no sumó indica el motivo.
+\end{rf}
+
+\begin{rf}{RF03. Explorar premios cercanos}
+\textbf{Descripción:} el usuario ve en un mapa y en una lista los premios de los comercios adheridos, y puede filtrar los que ya le alcanzan.\\
+\textbf{Criterio de aceptación:} con permiso de ubicación la lista se ordena por distancia. Sin permiso se muestra ordenada de la A a la Z, sin bloquear la pantalla. Sin conexión se muestra el catálogo guardado con la hora de la última actualización.
+\end{rf}
+
+\begin{rf}{RF04. Canjear un premio}
+\textbf{Descripción:} el usuario confirma el canje manteniendo presionado el botón. Se descuentan los puntos y se genera un código para mostrar en el local.\\
+\textbf{Criterio de aceptación:} con conexión, el código aparece en menos de 3 segundos y vence a los 10 minutos. Sin conexión, el canje queda pendiente con los puntos reservados y se confirma solo al volver la red. Si el premio se agotó mientras tanto, los puntos vuelven al saldo y la app lo avisa.
+\end{rf}
+
+\subsection{Reglas de validación}
+
+Las reglas buscan premiar la desconexión elegida y no el tiempo en que el teléfono quedó quieto por otros motivos.
+
+\begin{table}[H]
+\centering\small
+\begin{tabularx}{\textwidth}{@{}l p{4.3cm} L@{}}
+\toprule
+\textbf{Regla} & \textbf{Valor} & \textbf{Motivo} \\
+\midrule
+Puntos & 1 por minuto válido & El usuario no tiene que hacer conversiones (P2). \\
+Duración mínima & 30 min de lunes a viernes, 45 min el fin de semana & Una pausa corta no cambia el hábito. El fin de semana es más fácil estar inactivo sin decidirlo. \\
+Horario de descanso & De 23 a 9 h no suma & Evita sumar puntos durmiendo. La pausa queda igual en el historial. \\
+Pausa que cruza las 23 h & Suman solo los minutos fuera del horario de descanso & Evita cortar la pausa de golpe. \\
+Tope diario & 240 puntos & Limita la acumulación con muchas pausas seguidas. \\
+Fin de la pausa & Al desbloquear, no al encender la pantalla & Una notificación enciende la pantalla, pero eso no es usar el teléfono. \\
+\bottomrule
+\end{tabularx}
+\caption{Reglas de validación de pausas.}
+\label{tab:reglas}
+\end{table}
+
+\subsection{Requisitos no funcionales}
+
+\begin{table}[H]
+\centering\small
+\begin{tabularx}{\textwidth}{@{}l l L L@{}}
+\toprule
+\textbf{ID} & \textbf{Tipo} & \textbf{Requisito} & \textbf{Cómo se verifica} \\
+\midrule
+RNF01 & Batería & Sin servicios en primer plano ni procesos permanentes. La detección corre en WorkManager cada 15 min. Consumo atribuido a la app menor al 1\,\% en 24 h. & Revisión del manifest y medición con Battery Historian. \\
+RNF02 & Offline & Detectar pausas, ver saldo e historial y abrir el catálogo guardado funcionan en modo avión. & Prueba manual en modo avión. \\
+RNF03 & Privacidad & Solo se leen eventos de pantalla y bloqueo. No se guardan ni se envían nombres de apps. La ubicación se pide en primer plano y no sale del teléfono. & Revisión de código. El manifest no declara \texttt{ACCESS\_BACKGROUND\_LOCATION}. \\
+RNF04 & Confiabilidad & Una pausa se guarda en Room antes de notificar. Cerrar la app a la fuerza no pierde datos y la misma pausa nunca se cuenta dos veces. & Test instrumentado y test unitario del checkpoint. \\
+RNF05 & Usabilidad & Canjear un premio desde Inicio lleva como máximo 2 toques y 1 gesto de mantener. Objetivos táctiles de 48 dp o más. & Prueba con usuarios y Accessibility Scanner. \\
+RNF06 & Accesibilidad & Contraste AA, descripción en todos los íconos, uso completo con TalkBack y con fuente al 200\,\%. & Accessibility Scanner y prueba manual. \\
+RNF07 & Rendimiento & Arranque en frío menor a 2 s en un equipo de gama media. & Macrobenchmark. \\
+RNF08 & Compatibilidad & Android 9 (API 28) en adelante, porque los eventos de bloqueo existen desde esa versión. & Emuladores API 28 y 35. \\
+RNF09 & Mantenibilidad & Las reglas de validación están en el dominio, en Kotlin puro y sin dependencias de Android. Cobertura de tests del paquete \texttt{domain} de 80\,\% o más. & Reporte de cobertura (Kover). \\
+RNF10 & Seguridad & Tráfico solo por HTTPS. El token de sesión se guarda cifrado con Android Keystore. & Configuración de red sin \textit{cleartext} y revisión de código. \\
+\bottomrule
+\end{tabularx}
+\end{table}

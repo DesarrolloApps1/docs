@@ -1,0 +1,45 @@
+\section{Repositorio y equipo}
+\label{sec:equipo}
+
+\subsection{Repositorios}
+
+\begin{table}[H]
+\centering\small
+\begin{tabularx}{\textwidth}{@{}l L@{}}
+\toprule
+Código de la app & \url{https://github.com/DesarrolloApps1/tpo-da1} \\
+Documentación y diseño & \url{https://github.com/DesarrolloApps1/docs} (este documento y los archivos de Figma) \\
+Backend & \pendiente{a crear} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Forma de trabajo}
+
+\begin{itemize}
+\item \textbf{Ramas.} \texttt{main} tiene solo versiones entregables y está protegida. \texttt{dev} es la rama de integración. \texttt{tst} se usa para probar antes de pasar a \texttt{main}. Cada tarea se hace en \texttt{feature/<tema>}, que sale de \texttt{dev}.
+\item \textbf{Commits.} Chicos y frecuentes, en español y con prefijo: \texttt{feat:}, \texttt{fix:}, \texttt{docs:}, \texttt{test:}, \texttt{refactor:}.
+\item \textbf{Pull requests.} Un PR por funcionalidad hacia \texttt{dev}, con al menos una revisión de otro integrante y los tests pasando. Al cerrar un hito se pasa \texttt{dev} a \texttt{tst} y, después de probar, a \texttt{main}.
+\item \textbf{Tareas.} Un issue por requisito o pantalla, organizados en un tablero de GitHub Projects.
+\end{itemize}
+
+\subsection{Integrantes, roles y responsabilidades}
+
+Los roles no son exclusivos. Todos revisan código de otras áreas y tienen que poder explicar la app completa.
+
+\begin{table}[H]
+\centering\small
+\begin{tabularx}{\textwidth}{@{}l l L L@{}}
+\toprule
+\textbf{Integrante} & \textbf{Rol principal} & \textbf{Responsabilidades} & \textbf{Participa en} \\
+\midrule
+\pendiente{Nombre} & Arquitectura e integración & Estructura de capas, navegación, AppContainer, revisión de PRs & Todas las áreas \\
+\pendiente{Nombre} & UI y UX & Diseño en Figma, tema de Compose, pantallas y estados, accesibilidad & Pruebas con usuarios \\
+\pendiente{Nombre} & Datos y sincronización & Room, DataStore, Retrofit, backend y estrategia offline & Canje \\
+\pendiente{Nombre} & Detección y plataforma & Worker, UsageStatsManager, reglas de validación, notificaciones & Testing \\
+\pendiente{Nombre} & Testing y documentación & Tests unitarios y de UI, README, este documento & Todas las áreas \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\textbf{Cambios en el equipo:} \pendiente{ninguno hasta la fecha}.

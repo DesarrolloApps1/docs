@@ -1,0 +1,28 @@
+\section{Tecnologías previstas}
+\label{sec:tecnologias}
+
+\begin{table}[H]
+\centering\small
+\begin{tabularx}{\textwidth}{@{}l L@{}}
+\toprule
+\textbf{Tecnología} & \textbf{Para qué la usamos} \\
+\midrule
+Kotlin y Jetpack Compose & Stack de la materia. La UI declarativa simplifica dibujar los distintos estados de cada pantalla. \\
+Material 3 & Componentes base sobre los que aplicamos nuestros colores y tipografías. \\
+Navigation Compose & Tres pestañas, detalle, canje y perfil. Permite abrir el premio desde la notificación (deep link). \\
+ViewModel, StateFlow y Coroutines & Estado que sobrevive a la rotación y trabajo asíncrono sin bloquear la UI. \\
+Room & Fuente de verdad local: pausas, catálogo en caché y canjes. Es la base del offline first. \\
+DataStore & Preferencias, checkpoint de eventos y token de sesión. \\
+Retrofit, OkHttp y kotlinx.serialization & Comunicación con la API del equipo. \\
+WorkManager & Lectura periódica de eventos, sincronización del catálogo y reintento de canjes. Sobrevive a reinicios del teléfono. \\
+UsageStatsManager & Fuente de la detección. Requiere el permiso especial de acceso a uso, que el usuario da desde Ajustes. \\
+Notificaciones (NotificationCompat) & Aviso de pausa validada y de canje confirmado. En Android 13 o superior se pide el permiso. \\
+Maps Compose y Fused Location & Mapa de comercios y ubicación puntual, solo en primer plano. \\
+Credential Manager & Acceso con Google en un toque. \\
+JUnit, Turbine y Compose UI Test & Tests de reglas, ViewModels y pantallas. \\
+Ktor y PostgreSQL (backend) & API propia en el mismo lenguaje, con datos semilla de comercios y premios. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\textbf{Permisos que pide la app:} acceso a uso (obligatorio para sumar puntos), notificaciones (recomendado) y ubicación aproximada o precisa mientras se usa la app (opcional). No pide ubicación en segundo plano, cámara ni contactos.

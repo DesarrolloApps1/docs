@@ -1,0 +1,162 @@
+\section{Arquitectura}
+\label{sec:arquitectura}
+
+La app sigue MVVM con los principios de Clean Architecture. Las dependencias apuntan hacia el dominio: la UI conoce al ViewModel, el ViewModel a los casos de uso y los casos de uso solo conocen interfaces de repositorio. El dominio no importa nada de Android, así que las reglas de validación se prueban con tests unitarios comunes.
+
+\subsection{Capas y responsabilidades}
+
+\begin{table}[H]
+\centering\small
+\begin{tabularx}{\textwidth}{@{}l L@{}}
+\toprule
+\textbf{Capa} & \textbf{Qué contiene} \\
+\midrule
+Presentación & Pantallas en Jetpack Compose y un ViewModel por pantalla. Cada ViewModel expone un \texttt{StateFlow<UiState>} con los estados \textit{Loading}, \textit{Content}, \textit{Empty} y \textit{Error}, más una marca de offline. La UI no decide nada: dibuja el estado y envía eventos. \\
+Dominio & Modelos (\texttt{BreakSession}, \texttt{Reward}, \texttt{Business}, \texttt{Redemption}), las reglas de validación (\texttt{BreakRules}), los casos de uso (\texttt{SyncBreaks}, \texttt{GetHomeSummary}, \texttt{GetRewards}, \texttt{RedeemReward}, \texttt{SetGoal}) y las interfaces de los repositorios. \\
+Datos & Implementaciones de los repositorios, DAOs de Room, servicio Retrofit, DataStore y mappers entre entidades, DTOs y modelos. \\
+Plataforma & Workers de WorkManager, lectura de eventos con \texttt{UsageStatsManager}, notificaciones y ubicación. Están detrás de interfaces para poder reemplazarlos en los tests. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}
+com.takeabreak
+ |- ui/          screens, components, theme, navigation
+ |- presentation/ viewmodels y UiState
+ |- domain/      model, rules, usecase, repository (interfaces)
+ |- data/        local (Room, DataStore), remote (Retrofit), repository, mapper
+ |- platform/    workers, usage (UsageStatsManager), notifications, location
+ |- di/          AppContainer (inyección manual)
+\end{lstlisting}
+\end{minipage}
+
+La inyección de dependencias es manual, con un \texttt{AppContainer}. Para el tamaño del proyecto alcanza y evita sumar Hilt.
+
+\subsection{Flujo de datos}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  node distance=7mm and 7mm,
+  caja/.style={draw=bosque, fill=white, rounded corners=3pt, align=center, font=\footnotesize, minimum height=12mm, text width=22mm, line width=0.7pt},
+  ext/.style={caja, fill=crema, draw=gris},
+  capa/.style={font=\scriptsize\bfseries, text=verde},
+  flecha/.style={-{Stealth[length=2.2mm]}, thick, bosque},
+  vuelta/.style={-{Stealth[length=2.2mm]}, thick, verde, dashed},
+  etq/.style={font=\scriptsize, fill=white, inner sep=1.5pt}
+]
+\node[caja] (ui) {UI\\Compose};
+\node[caja, right=of ui] (vm) {ViewModel\\\texttt{StateFlow}};
+\node[caja, right=of vm] (uc) {Casos de uso\\\texttt{BreakRules}};
+\node[caja, right=of uc] (repo) {Repositorios};
+\node[ext, right=of repo, yshift=10mm] (room) {Room\\(fuente local)};
+\node[ext, right=of repo, yshift=-10mm] (api) {Retrofit\\API REST};
+
+\node[caja, below=16mm of uc, text width=26mm] (worker) {WorkManager\\\texttt{BreakSyncWorker}};
+\node[ext, left=15mm of worker, text width=28mm] (usage) {UsageStatsManager\\(Android)};
+\node[ext, right=15mm of worker] (notif) {Notificación\\local};
+
+\node[capa, above=2mm of ui.north east, xshift=4mm] {PRESENTACIÓN};
+\node[capa, above=2mm of uc] {DOMINIO};
+\node[capa, above=2mm of room] {DATOS};
+\node[capa, below=2mm of worker] {PLATAFORMA};
+
+\draw[flecha] (ui) to node[etq, above=1mm] {evento} (vm);
+\draw[flecha] (vm) to (uc);
+\draw[flecha] (uc) to (repo);
+\draw[flecha] (repo) to (room);
+\draw[flecha] (repo) to (api);
+
+\draw[vuelta] (room.north) |- ++(0,7mm) -| node[etq, pos=0.25, above=1mm] {Flow: cuando Room cambia, la UI se recompone sola} (ui.north);
+
+\draw[flecha] (worker) to node[etq, above=1mm] {1. lee} (usage);
+\draw[flecha] (worker) to node[etq, right] {2. valida y guarda} (uc);
+\draw[flecha] (worker) to node[etq, above=1mm] {3. avisa} (notif);
+\end{tikzpicture}
+\caption{Flujo de datos. La línea punteada es el camino de vuelta reactivo.}
+\end{figure}
+
+Room es la única fuente de verdad. La UI nunca lee de la red: la red actualiza Room y Room avisa a la UI por \texttt{Flow}. Por eso la app se ve igual con o sin conexión.
+
+\subsection{Cómo se detecta una pausa}
+
+\begin{enumerate}
+\item \texttt{BreakSyncWorker} corre cada 15 minutos (el mínimo de WorkManager) y también al abrir la app.
+\item Pide a \texttt{UsageStatsManager} los eventos desde el último \textit{checkpoint} guardado en DataStore. Solo usa cuatro tipos: pantalla encendida, pantalla apagada, pantalla bloqueada y desbloqueada.
+\item Arma las pausas cerradas: desde que se bloquea hasta que se desbloquea. Si la pantalla se enciende por una notificación y se vuelve a apagar sin desbloquear, la pausa sigue.
+\item \texttt{BreakRules} calcula los puntos, se guarda todo en Room en una transacción junto con el nuevo checkpoint y, si sumó, se muestra la notificación.
+\end{enumerate}
+
+Como el checkpoint se guarda en la misma transacción, si el proceso muere a la mitad no se pierde ni se duplica ninguna pausa. Las reglas quedan en una función pura:
+
+\noindent\begin{minipage}{\linewidth}
+\begin{lstlisting}
+object BreakRules {
+    const val DAILY_CAP = 240
+
+    fun points(pause: Pause, pointsToday: Int): Int {
+        val minMinutes = if (pause.isWeekend) 45 else 30
+        val countable = pause.minutesOutside(restFrom = 23, restTo = 9)
+        if (countable < minMinutes) return 0
+        return countable.coerceAtMost(DAILY_CAP - pointsToday)
+    }
+}
+\end{lstlisting}
+\end{minipage}
+
+\subsection{Topología de infraestructura}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  caja/.style={draw=bosque, fill=white, rounded corners=3pt, align=center, font=\footnotesize, minimum height=10mm, text width=29mm, line width=0.7pt},
+  so/.style={caja, fill=crema, draw=gris},
+  grupo/.style={draw=bosque, rounded corners=6pt, inner sep=4mm, line width=0.8pt},
+  titulo/.style={font=\scriptsize\bfseries, text=verde},
+  flecha/.style={{Stealth[length=2.2mm]}-{Stealth[length=2.2mm]}, thick, bosque},
+  etq/.style={font=\scriptsize, fill=white, inner sep=1.5pt}
+]
+% teléfono
+\node[caja] (app) at (0,0) {App Take a Break\\Compose + ViewModels};
+\node[caja] (room) at (0,-1.5) {Room (SQLite)\\pausas, catálogo, canjes};
+\node[caja] (ds) at (0,-3.0) {DataStore\\preferencias, checkpoint};
+\node[so] (wm) at (3.3,0) {WorkManager};
+\node[so] (usage) at (3.3,-1.5) {UsageStatsManager};
+\node[so] (loc) at (3.3,-3.0) {Fused Location\\Notificaciones};
+\node[so] (cred) at (3.3,-4.5) {Credential Manager};
+\node[grupo, fit=(app)(ds)(wm)(cred)(room), label={[titulo]above:TELÉFONO ANDROID (API 28+)}] (tel) {};
+
+% nube del equipo
+\node[caja] (ktor) at (10,0) {API REST\\Ktor};
+\node[caja] (pg) at (10,-1.5) {PostgreSQL\\comercios, premios, canjes};
+\node[grupo, fit=(ktor)(pg), label={[titulo]above:BACKEND DEL EQUIPO}] (nube) {};
+
+% google
+\node[so] (maps) at (10,-4.0) {Google Maps\\(tiles del mapa)};
+\node[so] (gid) at (10,-5.3) {Google Identity};
+\node[grupo, draw=gris, fit=(maps)(gid), label={[titulo]above:SERVICIOS DE GOOGLE}] (goo) {};
+
+\draw[flecha] (tel.east |- ktor) to node[etq, above=1mm] {HTTPS · JSON} (ktor.west);
+\draw[flecha] (ktor) to (pg);
+\draw[flecha] (tel.east |- maps) to node[etq, above=1mm] {HTTPS} (maps.west);
+\draw[flecha] (tel.east |- gid) to node[etq, above=1mm] {token de Google} (gid.west);
+\end{tikzpicture}
+\caption{Topología. El teléfono funciona solo; la red se usa para el catálogo, los canjes, el mapa y el acceso.}
+\end{figure}
+
+El backend es una API REST propia, hecha en Ktor para usar el mismo lenguaje que la app, con PostgreSQL y desplegada en un servicio gratuito como Render. Expone pocos endpoints:
+
+\begin{table}[H]
+\centering\small
+\begin{tabularx}{\textwidth}{@{}l L@{}}
+\toprule
+\textbf{Endpoint} & \textbf{Uso} \\
+\midrule
+\texttt{POST /auth/google} & Recibe el token de Google y devuelve un token de sesión. \\
+\texttt{GET /rewards?since=} & Catálogo de comercios y premios. Con \texttt{since} devuelve solo lo que cambió. \\
+\texttt{POST /redemptions} & Crea un canje. El teléfono manda un UUID propio, así un reintento no crea un canje duplicado. \\
+\texttt{GET /redemptions/\{id\}} & Estado de un canje (activo, usado, vencido, rechazado). \\
+\bottomrule
+\end{tabularx}
+\end{table}

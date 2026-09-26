@@ -1,0 +1,132 @@
+\section{Prototipar: diseño de la experiencia}
+\label{sec:prototipar}
+
+\subsection{Del boceto a Figma}
+
+Empezamos con bocetos en papel (Anexo~\ref{anx:bocetos}). Al pasarlos a Figma mantuvimos la ecuación “1 hora = 1 recompensa” del onboarding, las tarjetas de premios y la barra inferior de tres íconos. Cambiamos cuatro cosas:
+
+\begin{itemize}
+\item \textbf{Acceso unificado.} Los botones “Iniciar sesión”, “Google” y “Sign up” quedaron en dos: “Continuar con Google” y “Continuar con email”. Con menos opciones se decide más rápido (ley de Hick).
+\item \textbf{“Premios cerca” pasó a ser “Te alcanza hoy”.} En Inicio solo aparece lo que el usuario ya puede canjear.
+\item \textbf{Meta con barra de progreso.} El boceto pedía “una barra para saber cuánto falta”. Ahora es una tarjeta de meta que muestra lo que falta en puntos y en horas.
+\item \textbf{El gráfico se mudó a Actividad.} Inicio queda para lo que se consulta a diario.
+\end{itemize}
+
+\subsection{Look \& feel}
+
+Tomamos como referencia el estilo de Pasito: minimalista, con un verde bosque de marca, lima para los puntos y los botones sobre fondo oscuro, y fondo crema. Botones y chips tienen forma de píldora y no hay sombras: la jerarquía sale del color y del tamaño. Los títulos van en Bricolage Grotesque y el texto en DM Sans. El sistema completo está en el Anexo~\ref{anx:sistema}.
+
+\subsection{Ley de Fitts y fricción}
+
+La ley de Fitts dice que el tiempo para tocar algo crece con la distancia y baja con el tamaño del objetivo. En un teléfono que se usa con una mano, la distancia se mide desde el pulgar. Por eso:
+
+\begin{itemize}
+\item La acción principal de cada pantalla mide 56 dp de alto por 320 dp de ancho y siempre está abajo.
+\item La barra inferior tiene solo tres destinos, de 120 dp cada uno.
+\item Lo que se usa poco, como el perfil, va arriba.
+\item Canjear no se puede deshacer, así que se confirma manteniendo presionado un botón de 64 dp. Evita toques accidentales sin agregar un diálogo.
+\end{itemize}
+
+\begin{figure}[H]
+\centering
+\includegraphics[width=\textwidth]{00-fitts-zona-pulgar.png}
+\caption{Zona del pulgar sobre Inicio y la confirmación de canje. En rojo, los objetivos táctiles.}
+\end{figure}
+
+Medimos la fricción contando interacciones por tarea:
+
+\begin{table}[H]
+\centering\small
+\begin{tabularx}{\textwidth}{@{}L l L@{}}
+\toprule
+\textbf{Tarea} & \textbf{Interacciones} & \textbf{Cómo} \\
+\midrule
+Registrar una pausa & 0 & Detección pasiva. \\
+Ver cuánto sumó & 1 toque & Tocar la notificación. \\
+Canjear un premio que alcanza & 2 toques y mantener & Fila del premio, Canjear, mantener. \\
+Recuperar un código ya generado & 3 toques & Avatar, Mis canjes, Mostrar. \\
+Fijar una meta & 2 toques & Premio, Fijar como meta. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Pantallas principales}
+
+Diseñamos 27 pantallas de 360 $\times$ 800 dp. Estas son las del caso de uso principal. El número de cada una coincide con el nombre del frame en Figma.
+
+\begin{figure}[H]
+\centering
+\pantalla{08-inicio}{08 · Inicio}\hfill
+\pantalla{09-inicio-validado}{09 · Break validado}\hfill
+\pantalla{13-explorar}{13 · Explorar}\hfill
+\pantalla{17-detalle}{17 · Detalle}\\[10pt]
+\pantalla{19-confirmar-canje}{19 · Confirmar}\hfill
+\pantalla{20-codigo}{20 · Código}\hfill
+\pantalla{21-canje-pendiente}{21 · Canje pendiente}\hfill
+\pantalla{23-actividad}{23 · Actividad}
+\caption{Pantallas del caso de uso principal.}
+\end{figure}
+
+\subsubsection{Componentes y jerarquía}
+\begin{itemize}
+\item \textbf{Tarjeta de saldo}: es lo primero que se ve. El número grande en lima responde “¿cuánto tengo?”. El anillo muestra el avance del día contra la meta diaria.
+\item \textbf{Tarjeta de meta}: responde “¿cuánto me falta?”. Cuando alcanza, aparece ahí mismo el botón Canjear (pantalla 09).
+\item \textbf{Fila de premio}: ícono, nombre, comercio, distancia y un chip con los puntos. El chip es lima si alcanza y gris si no.
+\item \textbf{Hoja inferior de Explorar}: el mapa orienta, pero la lista (abajo, al alcance del pulgar) es la que se toca.
+\end{itemize}
+
+\subsubsection{Estados}
+
+La consigna pide representar carga, contenido, vacío, error y offline. La tabla indica qué frame cubre cada caso.
+
+\begin{table}[H]
+\centering\small
+\begin{tabularx}{\textwidth}{@{}l L L L L L@{}}
+\toprule
+\textbf{Pantalla} & \textbf{Carga} & \textbf{Contenido} & \textbf{Vacío} & \textbf{Error} & \textbf{Offline} \\
+\midrule
+Primer uso & 01 & 02 a 06 & & 07 (permiso rechazado) & \\
+Inicio     & 11 & 08, 09 & 10 & No aplica, datos locales & 12 \\
+Explorar   & Igual que 11 & 13 & & 14 (sin ubicación), 16 & 15 \\
+Canje      & 19 (mantener) & 17, 18, 20 & & 22 (sin stock) & 21 \\
+Actividad  & Igual que 11 & 23 & 24 & No aplica, datos locales & 23 \\
+Perfil     & & 25, 26 & & & 26 (pendiente) \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Flujo de pantallas}
+
+El diagrama de la página siguiente muestra el punto de entrada, las decisiones y los finales posibles:
+
+\begin{itemize}
+\item \textbf{Primer uso (A).} Splash, onboarding, acceso y permisos. La decisión es si el usuario da el acceso a uso. Si no lo da, puede reintentar o entrar igual a ver premios.
+\item \textbf{Ciclo principal (B).} Las flechas punteadas son transiciones del sistema. WorkManager lee los eventos, valida la pausa y, si es válida, notifica. Desde ahí el usuario llega al premio, confirma y, según haya conexión, obtiene el código o queda pendiente. El recorrido termina con el canje en el local o con los puntos devueltos.
+\item \textbf{Navegación (C).} Tres pestañas más el perfil desde el avatar.
+\end{itemize}
+
+\begin{landscape}
+\begin{figure}[p]
+\centering
+\includegraphics[width=\linewidth]{00-flujo-principal.png}
+\caption{Flujo principal de interacción.}
+\end{figure}
+\end{landscape}
+
+\section{Testear: plan de validación}
+\label{sec:testear}
+
+Todavía no probamos el diseño con usuarios. Antes de empezar a programar vamos a hacer dos validaciones.
+
+\textbf{1. Prueba del prototipo.} Con cinco personas del perfil de la sección~\ref{sec:empatizar} y el prototipo navegable de Figma. Primero una entrevista corta sobre cómo intentaron usar menos el celular. Después, cuatro tareas:
+
+\begin{enumerate}[label=T\arabic*.]
+\item Entender cómo se ganan puntos sin que nadie lo explique.
+\item Encontrar un premio que ya alcance y canjearlo.
+\item Decir por qué una pausa de anoche no sumó.
+\item Canjear sin conexión y explicar qué pasó.
+\end{enumerate}
+
+Vamos a medir si completan cada tarea, el tiempo, la cantidad de toques y los errores, y al final aplicar el cuestionario SUS. Si dos de cinco personas no pueden completar una tarea, esa parte se rediseña antes de implementarla.
+
+\textbf{2. Prueba técnica de la detección.} Una app mínima que lea los eventos de bloqueo con \texttt{UsageStatsManager} en tres dispositivos de marcas distintas y en el emulador. Sirve para confirmar que los eventos llegan completos antes de apoyar todo el producto en ellos.
