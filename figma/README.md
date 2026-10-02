@@ -2,13 +2,22 @@
 
 Frames de la preentrega. Todo sale de `build.py`, así que **no se editan los SVG a mano**: se cambia el script y se regenera.
 
+## Enlaces
+
+| Qué | Enlace |
+|---|---|
+| Prototipo navegable en Figma | https://www.figma.com/make/Asb8rgQEXHqEKvFAigfPCX |
+
 ```
 figma/
-├── build.py        # genera todo (tokens, componentes, pantallas, tableros)
-├── screens/        # 27 frames Android 360×800 dp  → importar en Figma
-├── boards/         # flujo principal, sistema de diseño, ley de Fitts
-├── png/            # exportes @2x para el documento LaTeX
-└── index.html      # galería con el estado y la decisión de diseño de cada frame
+├── build.py           # genera todo (tokens, componentes, pantallas, tableros)
+├── outline_text.py    # convierte el texto de los SVG en trazos para importarlos en Figma
+├── screens/           # 27 frames Android 360×800 dp
+├── boards/            # flujo principal, sistema de diseño, ley de Fitts
+├── screens_figma/     # screens/ con el texto convertido a trazos → importar en Figma
+├── boards_figma/      # boards/ con el texto convertido a trazos → importar en Figma
+├── png/               # exportes @2x para el documento LaTeX
+└── index.html         # galería con el estado y la decisión de diseño de cada frame
 ```
 
 ## Regenerar
@@ -20,11 +29,21 @@ python build.py --png    # además exporta png/ (usa Edge headless)
 
 ## Importar en Figma
 
+Figma no muestra el texto de los SVG de `screens/` y `boards/`: las formas aparecen, pero las letras no. Por eso se importan las versiones de `screens_figma/` y `boards_figma/`, donde el texto ya está convertido a trazos. Se ven igual que el diseño original, pero el texto queda como forma y no se puede editar en Figma.
+
 1. Crear un archivo nuevo en Figma con las páginas `Pantallas`, `Flujo` y `Sistema`.
-2. Arrastrar todos los `.svg` de `screens/` al lienzo: cada archivo queda como un frame de 360×800 con su nombre (`08-inicio`, …).
-   Los textos quedan editables; Figma ya incluye **Bricolage Grotesque**, **DM Sans** y **JetBrains Mono**.
-3. Arrastrar los tres `.svg` de `boards/` a sus páginas.
-4. (Opcional) Con los frames seleccionados: *Tidy up* → *Create prototype connections* siguiendo `boards/00-flujo-principal.svg`.
+2. Arrastrar todos los `.svg` de `screens_figma/` al lienzo de `Pantallas`: cada archivo queda como un frame de 360×800 con su nombre (`08-inicio`, …).
+3. Arrastrar los tres `.svg` de `boards_figma/` a sus páginas.
+4. (Opcional) Ordenar los frames con *Tidy up*. Las conexiones del prototipo se arman a mano, siguiendo `boards/00-flujo-principal.svg`.
+
+### Regenerar las versiones para Figma
+
+```bash
+pip install uharfbuzz fonttools
+python outline_text.py --fonts RUTA_A_LAS_FUENTES
+```
+
+Las fuentes (Bricolage Grotesque, DM Sans y JetBrains Mono, en su versión variable) se bajan de [google/fonts](https://github.com/google/fonts/tree/main/ofl). Si se cambia el diseño en `build.py`, hay que regenerar los SVG, volver a correr este script y reimportar en Figma.
 
 ## Pantallas
 
