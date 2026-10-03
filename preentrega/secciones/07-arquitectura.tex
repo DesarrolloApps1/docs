@@ -12,7 +12,7 @@ La app sigue MVVM con los principios de Clean Architecture. Las dependencias apu
 \textbf{Capa} & \textbf{Qué contiene} \\
 \midrule
 Presentación & Pantallas en Jetpack Compose y un ViewModel por pantalla. Cada ViewModel expone un \texttt{StateFlow<UiState>} con los estados \textit{Loading}, \textit{Content}, \textit{Empty} y \textit{Error}, más una marca de offline. La UI no decide nada: dibuja el estado y envía eventos. \\
-Dominio & Modelos (\texttt{BreakSession}, \texttt{Reward}, \texttt{Business}, \texttt{Redemption}), las reglas de validación (\texttt{BreakRules}), los casos de uso (\texttt{SyncBreaks}, \texttt{GetHomeSummary}, \texttt{GetRewards}, \texttt{RedeemReward}, \texttt{SetGoal}) y las interfaces de los repositorios. \\
+Dominio & Modelos (\texttt{BreakSession}, \texttt{Reward}, \texttt{Business}, \texttt{Redemption}), las reglas de validación (\texttt{BreakRules}), los casos de uso (\texttt{SyncBreaks}, \texttt{GetHomeSummary}, \texttt{GetRewards}, \texttt{RedeemReward}, \texttt{SetGoal}, \texttt{GetBreakHistory}, \texttt{GetRedemptions}) y las interfaces de los repositorios. \\
 Datos & Implementaciones de los repositorios, DAOs de Room, servicio Retrofit, DataStore y mappers entre entidades, DTOs y modelos. \\
 Plataforma & Workers de WorkManager, lectura de eventos con \texttt{UsageStatsManager}, notificaciones y ubicación. Están detrás de interfaces para poder reemplazarlos en los tests. \\
 \bottomrule
@@ -85,10 +85,10 @@ Room es la única fuente de verdad. La UI nunca lee de la red: la red actualiza 
 \item \texttt{BreakSyncWorker} corre cada 15 minutos (el mínimo de WorkManager) y también al abrir la app.
 \item Pide a \texttt{UsageStatsManager} los eventos desde el último \textit{checkpoint} guardado en DataStore. Solo usa cuatro tipos: pantalla encendida, pantalla apagada, pantalla bloqueada y desbloqueada.
 \item Arma las pausas cerradas: desde que se bloquea hasta que se desbloquea. Si la pantalla se enciende por una notificación y se vuelve a apagar sin desbloquear, la pausa sigue.
-\item \texttt{BreakRules} calcula los puntos, se guarda todo en Room en una transacción junto con el nuevo checkpoint y, si sumó, se muestra la notificación.
+\item \texttt{BreakRules} calcula los puntos, las pausas se guardan en Room, después se actualiza el checkpoint en DataStore y, si sumó, se muestra la notificación.
 \end{enumerate}
 
-Como el checkpoint se guarda en la misma transacción, si el proceso muere a la mitad no se pierde ni se duplica ninguna pausa. Las reglas quedan en una función pura:
+Cada pausa se identifica por la hora en que empezó, que es única en la tabla. Si el proceso muere antes de actualizar el checkpoint, la próxima lectura vuelve a traer esas pausas y Room las reemplaza en vez de duplicarlas, así que no se pierde ni se cuenta dos veces ninguna. Las reglas quedan en una función pura:
 
 \noindent\begin{minipage}{\linewidth}
 \begin{lstlisting}
