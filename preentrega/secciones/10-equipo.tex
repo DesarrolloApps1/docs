@@ -9,19 +9,51 @@
 \toprule
 Código de la app & \url{https://github.com/DesarrolloApps1/tpo-da1} \\
 Documentación y diseño & \url{https://github.com/DesarrolloApps1/docs} (este documento y los archivos de Figma) \\
-Backend & \pendiente{a crear} \\
+Diseño en Figma & \url{https://www.figma.com/community/file/1687633708033076651/take-a-break-diseno} \\
+Backend & \url{https://github.com/DesarrolloApps1/tpo-da1-backend} (API REST en Ktor) \\
 \bottomrule
 \end{tabularx}
 \end{table}
 
 \subsection{Forma de trabajo}
 
+Los tres repositorios siguen el mismo esquema de ramas.
+
 \begin{itemize}
-\item \textbf{Ramas.} \texttt{main} tiene solo versiones entregables y está protegida. \texttt{dev} es la rama de integración. \texttt{tst} se usa para probar antes de pasar a \texttt{main}. Cada tarea se hace en \texttt{feature/<tema>}, que sale de \texttt{dev}.
+\item \textbf{Ramas fijas.} Cada repositorio tiene dos ramas permanentes. \texttt{main} guarda la versión estable, la que se puede entregar. \texttt{dev} es donde se va integrando el trabajo iterativo.
+\item \textbf{Ramas de trabajo.} Para agregar algo nuevo, cada integrante crea una rama a partir de \texttt{dev} con el formato \texttt{nombre/feature}. Por ejemplo, si Joaquín trabaja en mejoras de la interfaz, la rama se llama \texttt{joa/mejoras-ui}.
+\item \textbf{Pull requests.} Cuando el trabajo en la rama está listo, se abre un pull request hacia \texttt{dev}. Una vez que \texttt{dev} acumula avances estables suficientes, se abre un pull request de \texttt{dev} a \texttt{main}.
+\item \textbf{Limpieza.} Después de que una rama se mergea en \texttt{dev}, se elimina, para no acumular ramas sin uso.
 \item \textbf{Commits.} Chicos y frecuentes, en español y con prefijo: \texttt{feat:}, \texttt{fix:}, \texttt{docs:}, \texttt{test:}, \texttt{refactor:}.
-\item \textbf{Pull requests.} Un PR por funcionalidad hacia \texttt{dev}, con al menos una revisión de otro integrante y los tests pasando. Al cerrar un hito se pasa \texttt{dev} a \texttt{tst} y, después de probar, a \texttt{main}.
 \item \textbf{Tareas.} Un issue por requisito o pantalla, organizados en un tablero de GitHub Projects.
 \end{itemize}
+
+\begin{figure}[H]
+\centering
+\begin{tikzpicture}[
+  rama/.style={font=\small\ttfamily\bfseries,anchor=east},
+  commit/.style={circle,draw=#1,fill=#1,minimum size=6pt,inner sep=0pt},
+  flujo/.style={-{Stealth[length=5pt]},thick,draw=gris}]
+\node[rama,text=bosque] at (-0.3,1.6) {main};
+\node[rama,text=verde]  at (-0.3,0.8) {dev};
+\node[rama,text=gris]   at (-0.3,0)   {joa/mejoras-ui};
+\draw[very thick,bosque] (0,1.6) -- (9,1.6);
+\draw[very thick,verde]  (0,0.8) -- (9,0.8);
+\draw[very thick,gris]   (1.5,0) -- (4.5,0);
+\node[commit=bosque] (m1) at (0.5,1.6) {};
+\node[commit=bosque] (m2) at (7.5,1.6) {};
+\node[commit=verde]  (d1) at (1,0.8) {};
+\node[commit=verde]  (d2) at (5,0.8) {};
+\node[commit=verde]  (d3) at (6.5,0.8) {};
+\node[commit=gris]   (f1) at (2.5,0) {};
+\node[commit=gris]   (f2) at (3.8,0) {};
+\draw[flujo] (d1) -- (1.5,0);
+\draw[flujo] (4.5,0) -- node[below right,font=\scriptsize,text=gris]{PR y se borra la rama} (d2);
+\draw[flujo] (d3) -- (m2);
+\node[font=\scriptsize,text=gris,anchor=west] at (7.6,1.2) {PR de versión estable};
+\end{tikzpicture}
+\caption{Flujo de ramas en los repositorios del equipo.}
+\end{figure}
 
 \subsection{Integrantes, roles y responsabilidades}
 

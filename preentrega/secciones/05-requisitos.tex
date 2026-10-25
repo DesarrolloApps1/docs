@@ -58,7 +58,7 @@ Fin de la pausa & Al desbloquear, no al encender la pantalla & Una notificación
 RNF01 & Batería & Sin servicios en primer plano ni procesos permanentes. La detección corre en WorkManager cada 15 min. Consumo atribuido a la app menor al 1\,\% en 24 h. & Revisión del manifest y medición con Battery Historian. \\
 RNF02 & Offline & Detectar pausas, ver saldo e historial y abrir el catálogo guardado funcionan en modo avión. & Prueba manual en modo avión. \\
 RNF03 & Privacidad & Solo se leen eventos de pantalla y bloqueo. No se guardan ni se envían nombres de apps. La ubicación se pide en primer plano y no sale del teléfono. & Revisión de código. El manifest no declara \texttt{ACCESS\_BACKGROUND\_LOCATION}. \\
-RNF04 & Confiabilidad & Una pausa se guarda en Room antes de notificar. Cerrar la app a la fuerza no pierde datos y la misma pausa nunca se cuenta dos veces. & Test instrumentado y test unitario del checkpoint. \\
+RNF04 & Confiabilidad & Una pausa se guarda en Room antes de notificar. Cerrar la app a la fuerza no pierde datos y la misma pausa nunca se cuenta dos veces. & Test instrumentado y test unitario que guarda dos veces la misma pausa. \\
 RNF05 & Usabilidad & Canjear un premio desde Inicio lleva como máximo 2 toques y 1 gesto de mantener. Objetivos táctiles de 48 dp o más. & Prueba con usuarios y Accessibility Scanner. \\
 RNF06 & Accesibilidad & Contraste AA, descripción en todos los íconos, uso completo con TalkBack y con fuente al 200\,\%. & Accessibility Scanner y prueba manual. \\
 RNF07 & Rendimiento & Arranque en frío menor a 2 s en un equipo de gama media. & Macrobenchmark. \\
