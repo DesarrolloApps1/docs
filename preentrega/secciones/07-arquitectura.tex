@@ -154,6 +154,7 @@ El backend es una API REST propia, hecha en Ktor para usar el mismo lenguaje que
 \textbf{Endpoint} & \textbf{Uso} \\
 \midrule
 \texttt{POST /auth/google} & Recibe el token de Google y devuelve un token de sesión. \\
+\texttt{POST /auth/email} & Registra o identifica al usuario con email y contraseña y devuelve un token de sesión. \\
 \texttt{GET /rewards?since=} & Catálogo de comercios y premios. Con \texttt{since} devuelve solo lo que cambió. \\
 \texttt{POST /redemptions} & Crea un canje. El teléfono manda un UUID propio, así un reintento no crea un canje duplicado. \\
 \texttt{GET /redemptions/\{id\}} & Estado de un canje (activo, usado, vencido, rechazado). \\
