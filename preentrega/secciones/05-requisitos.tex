@@ -21,8 +21,8 @@ En todos los casos el usuario involucrado es el usuario final de la app.
 \end{rf}
 
 \begin{rf}{RF04. Canjear un premio}
-\textbf{Descripción:} el usuario confirma el canje manteniendo presionado el botón. Se descuentan los puntos y se genera un código para mostrar en el local.\\
-\textbf{Criterio de aceptación:} con conexión, el código aparece en menos de 3 segundos y vence a los 10 minutos. Sin conexión, el canje queda pendiente con los puntos reservados y se confirma solo al volver la red. Si el premio se agotó mientras tanto, los puntos vuelven al saldo y la app lo avisa.
+\textbf{Descripción:} el usuario confirma el canje manteniendo presionado el botón. El servidor valida el stock y el saldo, descuenta los puntos y genera un código para mostrar en el local. El cajero confirma la entrega escribiendo el PIN del comercio en el teléfono del usuario.\\
+\textbf{Criterio de aceptación:} con conexión, el código aparece en menos de 3 segundos y vence a los 10 minutos; si vence sin usarse, los puntos vuelven al saldo. Sin conexión no se canjea y no se descuentan puntos. Con el PIN correcto, el canje pasa a usado en un único cambio de estado atómico, así un código no se puede usar dos veces aunque lleguen dos pedidos juntos. Al quinto PIN incorrecto, el canje queda rechazado y los puntos vuelven al saldo.
 \end{rf}
 
 \subsection{Reglas de validación}

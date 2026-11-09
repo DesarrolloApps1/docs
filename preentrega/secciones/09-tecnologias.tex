@@ -14,9 +14,9 @@ ViewModel, StateFlow y Coroutines & Estado que sobrevive a la rotación y trabaj
 Room & Fuente de verdad local: pausas, catálogo en caché y canjes. Es la base del offline first. \\
 DataStore & Preferencias, checkpoint de eventos y token de sesión. \\
 Retrofit, OkHttp y kotlinx.serialization & Comunicación con la API del equipo. \\
-WorkManager & Lectura periódica de eventos, sincronización del catálogo y reintento de canjes. Sobrevive a reinicios del teléfono. \\
+WorkManager & Lectura periódica de eventos, sincronización del catálogo y envío de los puntos. Sobrevive a reinicios del teléfono. \\
 UsageStatsManager & Fuente de la detección. Requiere el permiso especial de acceso a uso, que el usuario da desde Ajustes. \\
-Notificaciones (NotificationCompat) & Aviso de pausa validada y de canje confirmado. En Android 13 o superior se pide el permiso. \\
+Notificaciones (NotificationCompat) & Aviso de pausa validada. En Android 13 o superior se pide el permiso. \\
 Maps Compose y Fused Location & Mapa de comercios y ubicación puntual, solo en primer plano. \\
 Credential Manager & Acceso con Google en un toque. \\
 JUnit, Turbine y Compose UI Test & Tests de reglas, ViewModels y pantallas. \\
