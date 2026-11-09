@@ -69,8 +69,8 @@ Priorizamos cerrar un solo ciclo completo: \textbf{detectar $\rightarrow$ valida
 \item Detección pasiva de pausas y validación con reglas anti-abuso.
 \item Saldo, meta, racha e historial, todo offline.
 \item Catálogo de 5 o 6 comercios de ejemplo, con mapa y lista.
-\item Canje con código, incluido el canje pendiente sin conexión.
-\item Notificación local al validar una pausa o confirmar un canje.
+\item Canje con código y confirmación de la entrega con el PIN del comercio.
+\item Notificación local al validar una pausa.
 \item Acceso con Google o email.
 \end{itemize}
 \end{minipage}\hfill
@@ -87,4 +87,4 @@ Priorizamos cerrar un solo ciclo completo: \textbf{detectar $\rightarrow$ valida
 \end{minipage}
 
 \medskip
-\textbf{Limitación conocida.} Los puntos se calculan en el teléfono y el servidor confía en ese cálculo al canjear. Alcanza para un prototipo con comercios de prueba. Un producto real tendría que validar las pausas del lado del servidor.
+\textbf{Limitación conocida.} Las pausas se detectan y se validan en el teléfono, y nunca llegan al servidor. El servidor lleva un libro de movimientos por usuario, con el total de puntos de cada día, los débitos de los canjes y las devoluciones, y a partir de ese libro define el saldo que se puede gastar. Una app modificada podría informar puntos que no ganó, pero como máximo 240 por día. Alcanza para un prototipo con comercios de prueba. Un producto real necesitaría una forma de verificar las pausas del lado del servidor.
