@@ -33,8 +33,9 @@ Las pruebas del backend corren sobre Ktor \texttt{testApplication}.
 
 \begin{itemize}
 \item \textbf{Saldo confirmado por el servidor.} El teléfono informa el total de cada día y recibe el
-saldo que se puede gastar. Sin esa confirmación el saldo se calcula localmente y se marca como
-``por confirmar''.
+saldo que se puede gastar. Lo ganado que todavía no se informó aparece aparte como ``por confirmar''
+y no se puede gastar hasta que el servidor lo confirme. Si nunca hubo una sincronización, el saldo se
+calcula en el teléfono.
 \item \textbf{Idempotencia.} El teléfono genera el identificador del canje. Si la red falla y se reintenta,
 el servidor devuelve el mismo canje y no lo descuenta dos veces. Lo mismo vale para el envío de puntos.
 \item \textbf{Concurrencia en el servidor.} El descuento de saldo y de stock se hace dentro de la misma
