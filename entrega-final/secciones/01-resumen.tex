@@ -1,0 +1,26 @@
+\section{Resumen}
+
+Take a Break es una aplicación Android que detecta, sin que la persona tenga que hacer nada, los
+períodos en que dejó el teléfono bloqueado. Esos períodos se validan con reglas simples y se convierten
+en puntos. Los puntos se canjean por premios en comercios cercanos, y el comercio confirma la entrega
+con el PIN de su local, sin necesidad de instalar nada.
+
+La preentrega fijó el problema, el usuario y el alcance. Esta entrega muestra la versión implementada,
+las decisiones que cambiaron respecto de la preentrega y lo que todavía no está cubierto.
+
+\subsection{Estado de los requisitos funcionales}
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\linewidth}{@{}>{\bfseries}l L L@{}}
+\toprule
+Requisito & Descripción & Estado \\
+\midrule
+RF01 & Detectar y validar pausas con el bloqueo de pantalla & Implementado y cubierto por tests de dominio \\
+RF02 & Consultar saldo, meta e historial, con racha & Implementado \\
+RF03 & Explorar premios, con sincronización offline & Lista implementada. Mapa y orden por distancia pendientes \\
+RF04 & Canjear un premio y confirmar la entrega con el PIN del comercio & Implementado. El canje requiere conexión \\
+\bottomrule
+\end{tabularx}
+\caption{Estado de los requisitos funcionales al momento de la entrega.}
+\end{table}

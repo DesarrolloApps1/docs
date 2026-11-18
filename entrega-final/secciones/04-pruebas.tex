@@ -1,0 +1,48 @@
+\section{Pruebas}
+
+\subsection{Pruebas automáticas}
+
+\begin{tabularx}{\linewidth}{@{}L L L@{}}
+\toprule
+Suite & Alcance & Resultado \\
+\midrule
+Tests unitarios de la app & Reglas de puntos, casos de uso, repositorios, workers y ViewModels & 183 tests. Corren en la JVM, sin emulador \\
+Tests del backend & Autenticación, catálogo, canjes, uso con PIN, libro de puntos y concurrencia & 78 casos declarados \\
+Cobertura de \texttt{domain} & Umbral de 80 \% verificado por Kover en el CI & \pendiente{medir cobertura final} \\
+Tests instrumentados & Room, workers con work-testing y RNF04 & \pendiente{ejecutar en emulador API 28 y API 35} \\
+Tests de UI & Pantallas en cada estado y gesto de confirmación & \pendiente{ejecutar en emulador} \\
+\bottomrule
+\end{tabularx}
+
+Durante la última corrida local de tests unitarios, cuatro pruebas de \texttt{SessionStoreTest} fallaron
+en Windows porque DataStore no pudo renombrar su archivo temporal. Es un problema del entorno de
+ejecución. \pendiente{confirmar que el CI en Linux pase}
+
+\subsection{Plan de pruebas manuales}
+
+El plan sigue la app desde que se instala hasta el canje. Se ejecuta en un teléfono real y en un emulador.
+Cada caso se marca como aprobado, fallado o no ejecutado.
+
+\begin{enumerate}
+\item Instalar la app y completar el primer uso.
+\item Entrar con email. Con Google, si el cliente ID está configurado.
+\item Dar el acceso a uso y comprobar que la app detecta la vuelta desde Ajustes.
+\item Bloquear el teléfono durante más de 30 minutos un día hábil y comprobar que la pausa suma.
+\item Comprobar que una pausa dentro del horario de descanso no suma y que su motivo aparece en Actividad.
+\item Canjear un premio con saldo suficiente y confirmar la entrega con el PIN del local.
+\item Intentar usar el mismo código otra vez y comprobar que no pasa nada.
+\item Intentar canjear en modo avión y comprobar que no se descuentan puntos.
+\item Dejar pasar varios días sin abrir la app y comprobar que las pausas se acreditan al abrirla.
+\item Rechazar los permisos y comprobar que la app sigue funcionando y lo indica.
+\end{enumerate}
+
+\pendiente{resultados del plan: dispositivo, versión de Android, fecha y resultado de cada caso}
+
+\subsection{Batería, arranque y privacidad}
+
+Las mediciones de consumo de batería, de arranque en frío y la revisión de privacidad forman parte del
+plan de pruebas de la última iteración. \pendiente{medición de batería en 24 h}
+\pendiente{arranque en frío con Macrobenchmark}
+
+La revisión final de privacidad y seguridad (manifiesto, tráfico en texto plano, tokens en los logs y
+solicitudes sin pausas ni horarios) todavía no se completó. \pendiente{revisión de privacidad}
