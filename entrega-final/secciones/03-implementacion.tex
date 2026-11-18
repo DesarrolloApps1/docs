@@ -1,0 +1,65 @@
+\section{Implementación}
+
+\subsection{Arquitectura}
+
+La app sigue MVVM con principios de Clean Architecture. Las dependencias apuntan hacia el dominio: la
+interfaz conoce a los ViewModels, los ViewModels a los casos de uso y los casos de uso solo a interfaces
+de repositorio. Room es la única fuente de verdad. La red actualiza Room y la interfaz observa Room
+mediante \texttt{Flow}.
+
+\begin{tabularx}{\linewidth}{@{}>{\ttfamily}l L@{}}
+\toprule
+Paquete & Responsabilidad \\
+\midrule
+ui & Pantallas Compose, componentes, tema y navegación \\
+presentation & ViewModels y estados de pantalla \\
+domain & Modelos, reglas de puntos, casos de uso e interfaces, en Kotlin puro \\
+data & Room, DataStore, Retrofit, repositorios y mapeos \\
+platform & Workers, UsageStatsManager, notificaciones, ubicación y tile \\
+di & Contenedor de dependencias \\
+\bottomrule
+\end{tabularx}
+
+El backend es una API en Ktor con Exposed y PostgreSQL. Tiene autenticación con JWT, el catálogo y el
+libro de puntos, y la confirmación de canjes con PIN.
+
+\subsection{Tecnologías}
+
+Kotlin, Android, Jetpack Compose, Navigation Compose, ViewModel con Flow, Room, DataStore, Retrofit,
+WorkManager, Ktor, Exposed y PostgreSQL. Las pruebas usan JUnit, Turbine, MockWebServer y work-testing.
+Las pruebas del backend corren sobre Ktor \texttt{testApplication}.
+
+\subsection{Decisiones relevantes}
+
+\begin{itemize}
+\item \textbf{Saldo confirmado por el servidor.} El teléfono informa el total de cada día y recibe el
+saldo que se puede gastar. Lo ganado que todavía no se informó aparece aparte como ``por confirmar''
+y no se puede gastar hasta que el servidor lo confirme. Si nunca hubo una sincronización, el saldo se
+calcula en el teléfono.
+\item \textbf{Idempotencia.} El teléfono genera el identificador del canje. Si la red falla y se reintenta,
+el servidor devuelve el mismo canje y no lo descuenta dos veces. Lo mismo vale para el envío de puntos.
+\item \textbf{Concurrencia en el servidor.} El descuento de saldo y de stock se hace dentro de la misma
+transacción, con bloqueo sobre el usuario. Dos canjes simultáneos no pueden gastar el mismo saldo ni
+tomar el último stock.
+\item \textbf{Código de un solo uso.} El código vence a los 10 minutos. Un PIN incorrecto cuenta como
+intento, y con 5 intentos fallidos el canje se rechaza y los puntos vuelven al saldo.
+\item \textbf{Privacidad.} Ninguna pausa ni horario sale del teléfono. El servidor solo recibe totales
+por día, con un máximo de 240 puntos. La app no registra nombres de otras aplicaciones, solo los
+eventos de pantalla y de servicios que necesita.
+\item \textbf{Tokens cifrados.} La sesión se guarda cifrada con AES-GCM y una clave del Android Keystore.
+\item \textbf{Reglas configurables.} Los parámetros de puntos (horario de descanso, mínimos, topes,
+bonus) viven en un objeto de configuración. Cambiarlos no obliga a tocar el código que los aplica.
+\end{itemize}
+
+\subsection{Sincronización offline}
+
+El catálogo se sincroniza cada 6 horas con red, y al abrir Explorar si pasó más de una hora desde la
+última sincronización. Los puntos se envían al abrir la app y después de cada validación que sumó. Si no
+hay red, la sincronización espera a que vuelva. Los canjes y la confirmación con PIN necesitan conexión
+y avisan al usuario cuando no la tienen.
+
+\subsection{Cómo se ejecuta}
+
+Las instrucciones completas están en el README de cada repositorio. En la práctica, la app se abre en
+Android Studio, y el backend se levanta con \texttt{docker compose up -d --build}. La app de debug apunta
+a \texttt{http://10.0.2.2:8080/}.

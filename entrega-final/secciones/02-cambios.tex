@@ -1,0 +1,24 @@
+\section{Cambios respecto de la preentrega}
+
+Durante el desarrollo algunas decisiones cambiaron. Cada cambio figura acá con su motivo.
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\linewidth}{@{}L L L@{}}
+\toprule
+Tema & Preentrega & Entrega final \\
+\midrule
+Detección de pausas & Un trabajo periódico lee los eventos cada 15 minutos & Android guarda los eventos aunque la app no corra. La app los lee después desde el último checkpoint, así que no se pierde ninguna pausa \\
+Confianza en el teléfono & El teléfono informaba el saldo & El servidor lleva un libro de movimientos con el total de cada día, valida el tope y define el saldo que se puede gastar \\
+Canje sin conexión & Un canje sin red quedaba pendiente & El canje requiere conexión, porque el código lo genera el servidor. Sin red no se descuenta ningún punto \\
+Uso del código & Sin paso de confirmación del comercio & El comercio confirma la entrega con su PIN. El uso es atómico y admite 5 intentos \\
+Pausas involuntarias & Toda pausa con el teléfono bloqueado sumaba & Se agregan reglas: tope de 3 h por pausa y no suma si otra app tenía un servicio activo \\
+Tile de break declarado & No existía & Un tile de ajustes rápidos permite declarar el break y recibir un bonus de 10 \% \\
+\bottomrule
+\end{tabularx}
+\caption{Principales cambios y su motivo.}
+\end{table}
+
+La promesa del producto también cambió. Ninguna señal del teléfono prueba que una pausa sea voluntaria,
+así que la app mide ``tiempo sin uso, excluyendo los casos involuntarios más comunes''. Los parámetros
+de las reglas se van a ajustar con una semana de registro manual del equipo. \pendiente{resultados de la semana de registro}
