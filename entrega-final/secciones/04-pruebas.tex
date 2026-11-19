@@ -6,9 +6,9 @@
 \toprule
 Suite & Alcance & Resultado \\
 \midrule
-Tests unitarios de la app & Reglas de puntos, casos de uso, repositorios, workers y ViewModels & 183 tests. Corren en la JVM, sin emulador \\
+Tests unitarios de la app & Reglas de puntos, casos de uso, repositorios, workers, ViewModels y escenarios de uso real & 207 tests. Corren en la JVM, sin emulador \\
 Tests del backend & Autenticación, catálogo, canjes, uso con PIN, libro de puntos y concurrencia & 78 casos declarados \\
-Cobertura de \texttt{domain} & Umbral de 80 \% verificado por Kover en el CI & \pendiente{medir cobertura final} \\
+Cobertura de \texttt{domain} & Umbral de 80 \% verificado por Kover en el CI & 100 \% de las líneas (medido con Kover el 19/11/2026). El CI falla si baja del 80 \% \\
 Tests instrumentados & Room, workers con work-testing y RNF04 & \pendiente{ejecutar en emulador API 28 y API 35} \\
 Tests de UI & Pantallas en cada estado y gesto de confirmación & \pendiente{ejecutar en emulador} \\
 \bottomrule
@@ -17,9 +17,48 @@ Tests de UI & Pantallas en cada estado y gesto de confirmación & \pendiente{eje
 Los tests unitarios de la app y los del backend corren en GitHub Actions en cada pull request y en cada
 cambio que llega a \texttt{dev}.
 
+\subsection{Escenarios de uso real}
+\label{sec:escenarios}
+
+Cada regla de puntos se prueba con la situación que la motiva. El test recorre el camino completo: los
+eventos que registraría Android, las pausas que arma la app y los puntos y el motivo que asignan las
+reglas (\texttt{ScenariosTest}, 16 casos que corren en el CI).
+
+\begin{table}[H]
+\centering
+\begin{tabularx}{\linewidth}{@{}L L L@{}}
+\toprule
+Situación & Regla que la cubre & Resultado \\
+\midrule
+Deja el teléfono en la mesa para cenar una hora & 1 punto por minuto válido & +60 \\
+Una notificación prende la pantalla sin desbloquear & La pausa sigue hasta desbloquear & Una sola pausa, +60 \\
+Mira la hora 20 segundos y lo vuelve a bloquear & Una pausa de menos de 1 min no se guarda & No aparece en el historial \\
+Lo deja 20 minutos para hacer un mandado & Mínimo de 30 min los días hábiles & 0, muy corta \\
+Duerme una siesta de 40 minutos un sábado & Mínimo de 45 min el fin de semana & 0, muy corta \\
+Duerme toda la noche & De 23 a 9 h no suma & 0, horario de descanso \\
+Lee de 22:30 a 23:45 & Solo cuentan los minutos antes de las 23 & +30 \\
+Se olvida el teléfono en un cajón 5 horas & Tope de 3 h por pausa & +180 \\
+Hace tres pausas de 2 horas el mismo día & Tope de 240 puntos por día & +120, +120 y 0 \\
+Pone música y bloquea el teléfono & No suma si un servicio reciente de otra app estuvo activo la mitad de la pausa o más & 0, había música \\
+Atiende una llamada larga con la pantalla apagada & La misma regla & 0, había una llamada \\
+La música se corta a los 10 minutos & El servicio no llega a la mitad de la pausa & +60 \\
+Tiene una VPN o un contador de pasos prendido todo el día & Se ignoran los servicios que arrancaron más de 30 min antes de bloquear & +60 \\
+El teléfono se apaga por batería a la mitad & El tiempo apagado no cuenta & +40 \\
+Cambia la hora del teléfono para sumar más & Una pausa con cambio de hora no suma & 0, cambió la hora \\
+La app se cierra justo después de guardar & Releer una pausa no la duplica ni le baja los puntos (RNF04) & Mismo resultado \\
+\bottomrule
+\end{tabularx}
+\caption{Escenarios de uso real y resultado de las reglas.}
+\end{table}
+
+Estos tests prueban la lógica de la app a partir de los eventos. Que Android entregue esos eventos y
+cuándo corre el worker con las restricciones de batería se comprueba en el emulador, con el plan de
+pruebas manuales.
+
 \subsection{Plan de pruebas manuales}
 
-El plan sigue la app desde que se instala hasta el canje. Se ejecuta en un teléfono real y en un emulador.
+El plan sigue la app desde que se instala hasta el canje. Se ejecuta en el emulador de Android Studio,
+con Android 9 (API 28) y Android 15 (API 35), porque ningún integrante tiene un teléfono Android.
 Cada caso se marca como aprobado, fallado o no ejecutado.
 
 \begin{enumerate}
