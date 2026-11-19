@@ -11,7 +11,13 @@ descuenta ningún punto.
 Android permita que la app corra.
 \item No hay pagos reales. Los comercios y los premios son datos de ejemplo.
 \item Las reglas de pausas involuntarias son una aproximación y no cubren todos los casos posibles.
-\pendiente{ajuste de los parámetros con la semana de registro manual}
+Están justificadas con 16 escenarios de uso real (sección~\ref{sec:escenarios}), pero no se compararon
+con el comportamiento de personas reales. Sus valores son parámetros, así que se pueden ajustar sin
+cambiar el código.
+\item Ningún integrante tiene un teléfono Android, así que la app se probó en el emulador. No se probó
+en marcas con ahorro de batería propio (por ejemplo Xiaomi o Samsung), que pueden demorar todavía más
+el aviso, ni se midió el consumo real de batería.
+\item La regla del servicio activo usa eventos que existen desde Android 10. En Android 9 no se aplica.
 \end{itemize}
 
 \subsection{Pendiente}
@@ -19,9 +25,9 @@ Android permita que la app corra.
 \begin{itemize}
 \item Mapa de Explorar con Google Maps y orden por distancia. Requiere la API key del equipo.
 \item Fuentes Bricolage Grotesque y DM Sans.
-\item Pantalla de permisos completa: notificaciones, exclusión de optimización de batería y caso rechazado.
+\item Pantalla de permiso rechazado (frame 07). La exclusión de la optimización de batería ya se pide en el primer uso y en Perfil.
 \item Onboarding que se muestra solo en el primer uso.
-\item Pruebas instrumentadas y de UI en dispositivo real, y prueba con usuarios.
+\item Pruebas en dispositivos reales, validación de las reglas con personas reales y prueba con usuarios.
 \end{itemize}
 
 \pendiente{actualizar esta lista con el estado final antes de la defensa}
