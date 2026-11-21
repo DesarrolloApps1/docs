@@ -9,8 +9,8 @@ Suite & Alcance & Resultado \\
 Tests unitarios de la app & Reglas de puntos, casos de uso, repositorios, workers, ViewModels y escenarios de uso real & 207 tests. Corren en la JVM, sin emulador \\
 Tests del backend & Autenticación, catálogo, canjes, uso con PIN, libro de puntos y concurrencia & 78 casos declarados \\
 Cobertura de \texttt{domain} & Umbral de 80 \% verificado por Kover en el CI & 100 \% de las líneas (medido con Kover el 19/11/2026). El CI falla si baja del 80 \% \\
-Tests instrumentados & Room, workers con work-testing y RNF04 & \pendiente{ejecutar en emulador API 28 y API 35} \\
-Tests de UI & Pantallas en cada estado y gesto de confirmación & \pendiente{ejecutar en emulador} \\
+Tests instrumentados & Room, workers con work-testing y RNF04 & 17 de 17 aprobados en el emulador (Android 16, API 36) el 20/11/2026. En API 28 no se ejecutaron \\
+Tests de UI & Pantallas en cada estado y gesto de confirmación & No implementados: las pantallas se recorrieron a mano en el emulador (plan de pruebas manuales) \\
 \bottomrule
 \end{tabularx}
 
@@ -57,9 +57,9 @@ pruebas manuales.
 
 \subsection{Plan de pruebas manuales}
 
-El plan sigue la app desde que se instala hasta el canje. Se ejecuta en el emulador de Android Studio,
-con Android 9 (API 28) y Android 15 (API 35), porque ningún integrante tiene un teléfono Android.
-Cada caso se marca como aprobado, fallado o no ejecutado.
+El plan sigue la app desde que se instala hasta el canje. Se ejecutó el 20/11/2026 en el emulador de
+Android Studio (Pixel 8, Android 16, API 36), porque ningún integrante tiene un teléfono Android, con el
+backend local y la cuenta de una persona nueva. Cada caso se marca como aprobado, fallado o no ejecutado.
 
 \begin{enumerate}
 \item Instalar la app y completar el primer uso.
@@ -74,13 +74,47 @@ Cada caso se marca como aprobado, fallado o no ejecutado.
 \item Rechazar los permisos y comprobar que la app sigue funcionando y lo indica.
 \end{enumerate}
 
-\pendiente{resultados del plan: dispositivo, versión de Android, fecha y resultado de cada caso}
+\begin{table}[H]
+\centering
+\begin{tabularx}{\linewidth}{@{}c L L@{}}
+\toprule
+Caso & Resultado & Observaciones \\
+\midrule
+1 & Aprobado & Splash, onboarding de tres pasos y acceso. La segunda vez el onboarding no aparece. En el paso 2 las tarjetas salían recortadas: se corrigió \\
+2 & Aprobado & Cuenta nueva con email. Google no se probó porque el cliente ID no está configurado \\
+3 & Aprobado & Sin el acceso a uso aparece el frame 07; al darlo desde Ajustes, la app sigue sola a Inicio \\
+4 & Aprobado & Una pausa simulada de 60 min sumó 60 puntos, llegó el aviso ``Break validado'' y se vio en Inicio y Actividad. Pausas reales de 70 s se detectaron y quedaron como ``muy corta'' \\
+5 & No ejecutado & Cubierto por los tests de escenarios (``duerme toda la noche'') \\
+6 & Aprobado & El código lo generó el servidor, con cuenta regresiva y hora en vivo. Con un PIN incorrecto quedan 4 intentos; con el correcto, la entrega se confirma \\
+7 & No ejecutado & Cubierto por los tests del backend (dos usos simultáneos, solo uno pasa) \\
+8 & Aprobado & En modo avión aparece el aviso sin conexión y el canje dice que hace falta red, sin descontar puntos \\
+9 & No ejecutado & Requiere días reales sin abrir la app; la retención de eventos de Android lo cubre en teoría \\
+10 & Aprobado & Rechazar el acceso a uso lleva al frame 07; ``Ahora no'' deja ver premios. La exclusión de batería abre el diálogo del sistema y queda activa \\
+\bottomrule
+\end{tabularx}
+\caption{Resultados del plan de pruebas manuales en el emulador.}
+\end{table}
+
+El recorrido encontró y corrigió tres errores: con el bloqueo de pantalla en ``Ninguno'' Android no emite
+los eventos de bloqueo y no se detectaba ninguna pausa (ahora se usa el apagado y el encendido de la
+pantalla); la ubicación nunca llegaba en el emulador y Explorar no se ordenaba por cercanía (ahora usa la
+última conocida tras 5 s); y la racha de Inicio decía ``1 días''.
 
 \subsection{Batería, arranque y privacidad}
 
-Las mediciones de consumo de batería, de arranque en frío y la revisión de privacidad forman parte del
-plan de pruebas de la última iteración. \pendiente{medición de batería en 24 h}
-\pendiente{arranque en frío con Macrobenchmark}
+El consumo de batería en 24 horas (RNF01) y el arranque en frío con Macrobenchmark (RNF07) no se
+midieron: en el emulador la batería es simulada y los tiempos no representan un teléfono real. Quedan como
+trabajo futuro. Por diseño, la app no usa servicios en primer plano ni ubicación en segundo plano, y lee
+los eventos solo cuando corre el worker o se abre la app.
 
-La revisión final de privacidad y seguridad (manifiesto, tráfico en texto plano, tokens en los logs y
-solicitudes sin pausas ni horarios) todavía no se completó. \pendiente{revisión de privacidad}
+La revisión de privacidad y seguridad se hizo sobre el código el 20/11/2026:
+
+\begin{itemize}
+\item El build de release no permite tráfico sin cifrar; solo el de debug habla con el backend local.
+\item El código no escribe logs y el token de sesión se guarda cifrado con una clave del Keystore.
+\item Los permisos son los mínimos: datos de uso, notificaciones y ubicación aproximada en primer plano.
+No se declara ubicación en segundo plano ni servicios en primer plano.
+\item Al servidor solo llegan los totales de puntos por día, sin pausas ni horarios.
+\item Se encontró que la copia de seguridad automática de Android subía la base con las pausas a la nube
+del usuario. Se desactivó (\texttt{allowBackup="false"}).
+\end{itemize}

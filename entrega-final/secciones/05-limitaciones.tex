@@ -18,16 +18,16 @@ cambiar el código.
 en marcas con ahorro de batería propio (por ejemplo Xiaomi o Samsung), que pueden demorar todavía más
 el aviso, ni se midió el consumo real de batería.
 \item La regla del servicio activo usa eventos que existen desde Android 10. En Android 9 no se aplica.
+\item En un teléfono sin bloqueo de pantalla, la pausa termina al prenderse la pantalla, aunque sea por una
+notificación: sin bloqueo, Android no distingue mirar la notificación de usar el teléfono.
 \end{itemize}
 
 \subsection{Pendiente}
 
 \begin{itemize}
-\item Mapa de Explorar con Google Maps y orden por distancia. Requiere la API key del equipo.
-\item Fuentes Bricolage Grotesque y DM Sans.
-\item Pantalla de permiso rechazado (frame 07). La exclusión de la optimización de batería ya se pide en el primer uso y en Perfil.
-\item Onboarding que se muestra solo en el primer uso.
-\item Pruebas en dispositivos reales, validación de las reglas con personas reales y prueba con usuarios.
+\item El mapa de Explorar necesita una API key de Google Maps en \texttt{local.properties}; sin ella se
+muestra solo la lista, ordenada por distancia o de la A a la Z.
+\item Pruebas en dispositivos reales y en Android 9, medición de batería y de arranque en frío.
+\item Tests de UI automáticos, revisión con TalkBack y prueba con usuarios.
+\item Validación de las reglas con el comportamiento de personas reales.
 \end{itemize}
-
-\pendiente{actualizar esta lista con el estado final antes de la defensa}
